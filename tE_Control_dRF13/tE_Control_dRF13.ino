@@ -166,13 +166,13 @@ float MagScaleY = 1.0;
 float MagScaleZ = 1.0;
 
 //IMU calibration parameters - calibrate IMU using calculate_IMU_error() in the void setup() to get these values, then comment out calculate_IMU_error()
-// Calibration on 01.04.24 by Benjamin Kelm
+// Calibration on 05.07.24 by Benjamin Kelm
 float AccErrorX = -0.00;
-float AccErrorY = 0.01;
-float AccErrorZ = 0.07;
-float GyroErrorX = -5.03;
-float GyroErrorY = -1.09;
-float GyroErrorZ = -0.38;
+float AccErrorY = -0.01;
+float AccErrorZ = -0.12;
+float GyroErrorX = -1.89;
+float GyroErrorY = 0.52;
+float GyroErrorZ = -1.85;
 
 
 //Controller parameters (take note of defaults before modifying!): 
@@ -218,20 +218,20 @@ const int ch5Pin = 21; //gear (throttle cut)
 const int ch6Pin = 22; //aux1 (free aux channel)
 const int PPM_Pin = 23; // BEN
 //OneShot125 ESC pin outputs:
-const int m1Pin = 2;
-const int m2Pin = 5;
-const int m3Pin = 8;
-const int m4Pin = 0;
-const int m5Pin = 12;
-const int m6Pin = 13;
+const int m1Pin = 4; // VR - grün
+const int m2Pin = 5; // VL - blau
+const int m3Pin = 6; // HR - orange
+const int m4Pin = 7; // HL - gelb
+const int m5Pin = 15;
+const int m6Pin = 16;
 //PWM servo or ESC outputs:
-const int servo1Pin = 4; // front tilt 
-const int servo2Pin = 6; // left tilt
-const int servo3Pin = 9; // right tilt
-const int servo4Pin = 3; // front flap
-const int servo5Pin = 7; // left flap
-const int servo6Pin = 10;// right flap
-const int servo7Pin = 11;
+const int servo1Pin = 3; // front tilt 
+const int servo2Pin = 9; // left tilt
+const int servo3Pin = 10; // right tilt
+const int servo4Pin = 11; // front flap
+const int servo5Pin = 12; // left flap
+const int servo6Pin = 13;// right flap
+const int servo7Pin = 14;
 PWMServo servo1;  //Create servo objects to control a servo or ESC with PWM
 PWMServo servo2;
 PWMServo servo3;
@@ -317,7 +317,7 @@ void setup() {
   pinMode(m4Pin, OUTPUT);
   pinMode(m5Pin, OUTPUT);
   pinMode(m6Pin, OUTPUT);
-  servo1.attach(servo1Pin, 1300, 1700); //Pin, min PWM value, max PWM value: BK modified range
+  servo1.attach(servo1Pin, 900, 2100); //Pin, min PWM value, max PWM value: BK modified range
   servo2.attach(servo2Pin, 1300, 1700);
   servo3.attach(servo3Pin, 1300, 1700);
   servo4.attach(servo4Pin, 1350, 1650);
@@ -332,6 +332,7 @@ void setup() {
 
   //Initialize radio communication
   radioSetup();
+
   
   //Set radio channels to default (safe) values before entering main loop
   channel_1_pwm = channel_1_fs;
@@ -350,9 +351,9 @@ void setup() {
   //calculate_IMU_error(); //Calibration parameters printed to serial monitor. Paste these in the user specified variables section, then comment this out forever.
 
   //Arm servo channels
-  servo1.write(180); //Command servo angle from 0-180 degrees (1000 to 2000 PWM)
+  servo1.write(0); //Command servo angle from 0-180 degrees (1000 to 2000 PWM)
   servo2.write(0); //Set these to 90 for servos if you do not want them to briefly max out on startup
-  servo3.write(180); //Keep these at 0 if you are using servo outputs for motors
+  servo3.write(90); //Keep these at 0 if you are using servo outputs for motors
   servo4.write(90);
   servo5.write(90);
   servo6.write(90);
@@ -476,19 +477,17 @@ void controlMixer() {
     maxRoll = 40.0;     //Max roll angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode 
     maxPitch = 40.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
     maxYaw = 160.0;     //Max yaw rate in deg/sec
-    
-    controlANGLE(); //Stabilize on angle setpoint
-    m1_command_scaled = thro_des- pitch_PID; //Front
-    m2_command_scaled = 0.9*thro_des + pitch_PID + roll_PID; //Left
-    m3_command_scaled = 0.9*thro_des + pitch_PID - roll_PID; //Right
 
-    s1_command_scaled = 0.85; // Front tilt
-    s2_command_scaled = 0.15 - yaw_PID; // left tilt
-    s3_command_scaled = 0.85 - yaw_PID; // right tilt
-    s4_command_scaled = 0.5; // Canard front
-    s5_command_scaled = 0.5; // Aileron left
-    s6_command_scaled = 0.5; // Aileron right
-        
+    // QUAD Mode 
+    controlANGLE(); //Stabilize on angle setpoint
+    m1_command_scaled = thro_des - pitch_PID - roll_PID - yaw_PID  ; // front right
+    m2_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID ; // front left
+    m3_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; //rear right
+    m4_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; //rear left
+
+
+    s1_command_scaled = 0.09 ; // Front tilt
+
   }
 
   // MODE 2: TRANSITION
@@ -497,18 +496,16 @@ void controlMixer() {
     maxRoll = 40.0;     //Max roll angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode 
     maxPitch = 25.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
     maxYaw = 160.0;     //Max yaw rate in deg/sec
-    
-    controlANGLE(); //Stabilize on angle setpoint
-    m1_command_scaled = thro_des - pitch_PID; //Front
-    m2_command_scaled = 0.9*thro_des + 0.5* pitch_PID + roll_PID; //Left
-    m3_command_scaled = 0.9*thro_des + 0.5* pitch_PID - roll_PID; //Right
 
-    s1_command_scaled = 0.60; // Front tilt
-    s2_command_scaled = 0.40 - 0.6*yaw_PID; // left tilt
-    s3_command_scaled = 0.65 - 0.6*yaw_PID; // right tilt
-    s4_command_scaled = 0.5 + 3*pitch_PID; // Canard front
-    s5_command_scaled = 0.5 - 3*roll_PID; // Aileron left
-    s6_command_scaled = 0.5 - 3*roll_PID; // Aileron right 
+    // QUAD mode 
+    controlANGLE(); //Stabilize on angle setpoint
+    m1_command_scaled = thro_des - pitch_PID - roll_PID - yaw_PID  ; // front right
+    m2_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID ; // front left
+    m3_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; //rear right
+    m4_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; //rear left
+
+    s1_command_scaled = 0.30  +  pitch_PID; // Front tilt
+
     
   }
   // MODE 3: LEVEL-FLIGHT
@@ -520,21 +517,18 @@ void controlMixer() {
     maxYaw = 200.0;     //Max yaw rate in deg/sec
     
     controlRATE(); //Stabilize on angle setpoint
-    m1_command_scaled = thro_des; //Front
-    m2_command_scaled = 0.9*thro_des - 0.1*yaw_PID + 0.2*roll_PID; //Left
-    m3_command_scaled = 0.9*thro_des + 0.1*yaw_PID - 0.2*roll_PID; //Right
+    m1_command_scaled = thro_des + yaw_PID  ; // front right
+    m2_command_scaled = thro_des - yaw_PID ; // front left
+    m3_command_scaled = -2* roll_PID ; //rear right
+    m4_command_scaled = +2* roll_PID ; //rear left
+    
+    s1_command_scaled = 0.90 + pitch_PID; // Front tilt
 
-    s1_command_scaled = 0.05; // Front tilt
-    s2_command_scaled = 0.95; // left tilt
-    s3_command_scaled = 0.05; // right tilt
-    s4_command_scaled = 0.45 + 1.1*pitch_PID; // Canard front
-    s5_command_scaled = 0.5 - 0.7* roll_PID; // Aileron left
-    s6_command_scaled = 0.5 - 0.7* roll_PID; // Aileron right  
 
   }
 
+// LEFT OVER SIGNALS
   //0.5 is centered servo, 0.0 is zero throttle if connecting to ESC for conventional PWM, 1.0 is max throttle
-  m4_command_scaled = 0; 
   m5_command_scaled = 0;
   m6_command_scaled = 0;
   s7_command_scaled = 0;

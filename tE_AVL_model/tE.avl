@@ -1,0 +1,112 @@
+# Benjamin Kelm, 31.05.2024
+tiny-Entlein
+0.0                      Mach
+0.0    0.0    0.0        iYsym  iZsym  Zsym
+0.09   0.100   0.434       Sref   Cref   Bref
+0.00   0.0    0.0        Xref   Yref   Zref
+0.017                    CDo
+#=============================================
+
+
+SURFACE
+CANARD
+10  1.0   20 -2.0
+YDUPLICATE
+     0.0
+ANGLE
+     0.0
+SCALE
+1.0  1.0  1.0
+TRANSLATE
+-0.230  0.0  0.0
+#--CENTER SECTION--------------------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+    0.0          0.0         0.0        0.080         0.0     7   0.25
+AFIL
+/Users/benjaminkelm/Desktop/20240531_tE/tinyEntlein/tE_AVL_model/clarky-il.dat
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+CONTROL
+elevator  1.0   0.3     0.0 1.0 0.0    1.0
+
+#--Ellipse-2/3-----------------------
+SECTION
+    0.006        0.120      0.0        0.062         0.0    11  -2.70
+AFIL
+/Users/benjaminkelm/Desktop/20240531_tE/tinyEntlein/tE_AVL_model/clarky-il.dat
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+CONTROL
+elevator  1.0   0.3     0.0 1.0 0.0    1.0
+
+#--Canard-Tip-------------------------
+SECTION
+    0.025        0.190      0.0        0.025        0.0    11  -2.25
+AFIL
+/Users/benjaminkelm/Desktop/20240531_tE/tinyEntlein/tE_AVL_model/clarky-il.dat
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+CONTROL
+elevator  1.0   0.4     0.0 1.0 0.0    1.0
+
+
+SURFACE
+WING
+10  1.0   45 -2.0
+
+YDUPLICATE
+     0.0
+ANGLE
+     0.0
+SCALE
+1.0  1.0  1.0
+TRANSLATE
+0.0  0.0  0.0
+#--CENTER SECTION--------------------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+    0.0          0.0         0.0        0.100         0.0     7   0.25
+AFIL
+/Users/benjaminkelm/Desktop/20240531_tE/tinyEntlein/tE_AVL_model/clarky-il.dat
+
+#--Aileron-Start -------------------------
+SECTION
+    0.012        0.145      0.0        0.076         0.0    11  -2.70
+AFIL
+/Users/benjaminkelm/Desktop/20240531_tE/tinyEntlein/tE_AVL_model/clarky-il.dat
+
+#--WINGTIP-------------------------
+SECTION
+    0.037        0.220      0.0        0.0265        0.0    11  -2.25
+AFIL
+/Users/benjaminkelm/Desktop/20240531_tE/tinyEntlein/tE_AVL_model/clarky-il.dat
+
+
+
+SURFACE
+Winglet
+10  1.0   12 -2.0
+# INDEX       | (keyword) or INDEX
+# 0               | Lcomp
+YDUPLICATE
+     0.0
+ANGLE
+     0.0
+SCALE
+1.0  1.0  1.0
+TRANSLATE
+0.0  0.0  0.0
+#--CENTER SECTION--------------------------------
+#    Xle         Yle         Zle         chord       angle   Nspan  Sspace
+SECTION
+  0.056          0.186       0.0        0.07         0.0     7   0.25
+AFIL
+/Users/benjaminkelm/Desktop/20240531_tE/tinyEntlein/tE_AVL_model/clarky-il.dat
+
+
+#--WINGTIP-------------------------
+SECTION
+    0.092        0.186      -0.055        0.031        0.0    11  -2.25
+AFIL
+/Users/benjaminkelm/Desktop/20240531_tE/tinyEntlein/tE_AVL_model/clarky-il.dat
+
+
+
