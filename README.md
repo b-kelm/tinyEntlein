@@ -30,6 +30,8 @@ Based upon the [dRehmFlight](https://github.com/nickrehm/dRehmFlight) controller
 ## CAD Project
 [tiny Entlein Onshape Project](https://cad.onshape.com/documents/107a331b13ce1d6b795540c4/w/6723dc1569f4c79b369058ea/e/535ad495e60443d4d2ff6294?renderMode=0&uiState=6659ccdb47e66a2a5d8b56c0)
 
-## Known Issues
+## Flight Testing
+06.07.2024 - Hover Tests: Worked well "out of the box".
+07.07.2024 - Maiden Flight: Transition Flight poses yaw issues. Light Pitch Oscillations at higher speeds - no catastrophic failure. CG has to go much further to the front then expected. 
 
 

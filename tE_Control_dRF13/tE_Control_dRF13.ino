@@ -499,12 +499,12 @@ void controlMixer() {
 
     // QUAD mode 
     controlANGLE(); //Stabilize on angle setpoint
-    m1_command_scaled = thro_des - pitch_PID - roll_PID - yaw_PID  ; // front right
-    m2_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID ; // front left
+    m1_command_scaled = thro_des - pitch_PID - roll_PID; // front right
+    m2_command_scaled = thro_des - pitch_PID + roll_PID; // front left
     m3_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; //rear right
     m4_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; //rear left
 
-    s1_command_scaled = 0.30  +  pitch_PID; // Front tilt
+    s1_command_scaled = 0.25  +  pitch_PID; // Front tilt
 
     
   }
@@ -514,15 +514,15 @@ void controlMixer() {
     i_limit = 25.0;     //Integrator saturation level, mostly for safety (default 25.0)
     maxRoll = 120.0;     //Max roll angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode 
     maxPitch = 70.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
-    maxYaw = 200.0;     //Max yaw rate in deg/sec
+    maxYaw = 90.0;     //Max yaw rate in deg/sec
     
     controlRATE(); //Stabilize on angle setpoint
-    m1_command_scaled = thro_des + yaw_PID  ; // front right
-    m2_command_scaled = thro_des - yaw_PID ; // front left
-    m3_command_scaled = -2* roll_PID ; //rear right
-    m4_command_scaled = +2* roll_PID ; //rear left
+    m1_command_scaled = thro_des + 0.5*yaw_PID ; // front right
+    m2_command_scaled = thro_des - 0.5*yaw_PID ; // front left
+    m3_command_scaled = -4* roll_PID + pitch_PID ; //rear right
+    m4_command_scaled = +4* roll_PID + pitch_PID; //rear left
     
-    s1_command_scaled = 0.90 + pitch_PID; // Front tilt
+    s1_command_scaled = 0.93 + 0.6*pitch_PID + 0.6*pitch_passthru; // Front tilt
 
 
   }
