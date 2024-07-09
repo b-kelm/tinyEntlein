@@ -181,20 +181,20 @@ float maxRoll = 40.0;     //Max roll angle in degrees for angle mode (maximum ~7
 float maxPitch = 40.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
 float maxYaw = 160.0;     //Max yaw rate in deg/sec
 
-float Kp_roll_angle = 0.2;    //Roll P-gain - angle mode 
+float Kp_roll_angle = 0.3;    //Roll P-gain - angle mode 
 float Ki_roll_angle = 0.3;    //Roll I-gain - angle mode
 float Kd_roll_angle = 0.05;   //Roll D-gain - angle mode (has no effect on controlANGLE2)
 float B_loop_roll = 0.9;      //Roll damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
-float Kp_pitch_angle = 0.2;   //Pitch P-gain - angle mode
+float Kp_pitch_angle = 0.3;   //Pitch P-gain - angle mode
 float Ki_pitch_angle = 0.3;   //Pitch I-gain - angle mode
-float Kd_pitch_angle = 0.05;  //Pitch D-gain - angle mode (has no effect on controlANGLE2)
+float Kd_pitch_angle = 0.04;  //Pitch D-gain - angle mode (has no effect on controlANGLE2)
 float B_loop_pitch = 0.9;     //Pitch damping term for controlANGLE2(), lower is more damping (must be between 0 to 1)
 
 float Kp_roll_rate = 0.15;    //Roll P-gain - rate mode
 float Ki_roll_rate = 0.2;     //Roll I-gain - rate mode
 float Kd_roll_rate = 0.0002;  //Roll D-gain - rate mode (be careful when increasing too high, motors will begin to overheat!)
 float Kp_pitch_rate = 0.15;   //Pitch P-gain - rate mode
-float Ki_pitch_rate = 0.15;    //Pitch I-gain - rate mode
+float Ki_pitch_rate = 0.10;    //Pitch I-gain - rate mode
 float Kd_pitch_rate = 0.0003; //Pitch D-gain - rate mode (be careful when increasing too high, motors will begin to overheat!)
 
 float Kp_yaw = 0.3;           //Yaw P-gain
@@ -351,7 +351,7 @@ void setup() {
   //calculate_IMU_error(); //Calibration parameters printed to serial monitor. Paste these in the user specified variables section, then comment this out forever.
 
   //Arm servo channels
-  servo1.write(0); //Command servo angle from 0-180 degrees (1000 to 2000 PWM)
+  servo1.write(12); //Command servo angle from 0-180 degrees (1000 to 2000 PWM)
   servo2.write(0); //Set these to 90 for servos if you do not want them to briefly max out on startup
   servo3.write(90); //Keep these at 0 if you are using servo outputs for motors
   servo4.write(90);
@@ -499,32 +499,45 @@ void controlMixer() {
 
     // QUAD mode 
     controlANGLE(); //Stabilize on angle setpoint
-    m1_command_scaled = thro_des - pitch_PID - roll_PID; // front right
-    m2_command_scaled = thro_des - pitch_PID + roll_PID; // front left
-    m3_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; //rear right
-    m4_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; //rear left
+    m1_command_scaled = thro_des - pitch_PID - roll_PID - 0.5* yaw_PID; // front right
+    m2_command_scaled = thro_des - pitch_PID + roll_PID + 0.5* yaw_PID; // front left
+    m3_command_scaled = thro_des + pitch_PID - roll_PID + 0.5* yaw_PID; //rear right
+    m4_command_scaled = thro_des + pitch_PID + roll_PID - 0.5* yaw_PID; //rear left
 
-    s1_command_scaled = 0.25  +  pitch_PID; // Front tilt
+    s1_command_scaled = 0.35  +  pitch_PID; // Front tilt
 
     
   }
   // MODE 3: LEVEL-FLIGHT
   if (channel_6_pwm < 1300){
-
+/*  RATE - Flies well
     i_limit = 25.0;     //Integrator saturation level, mostly for safety (default 25.0)
-    maxRoll = 120.0;     //Max roll angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode 
-    maxPitch = 70.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
-    maxYaw = 90.0;     //Max yaw rate in deg/sec
+    maxRoll = 200.0;     //Max roll angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode 
+    maxPitch = 100.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
+    maxYaw = 120.0;     //Max yaw rate in deg/sec
     
     controlRATE(); //Stabilize on angle setpoint
-    m1_command_scaled = thro_des + 0.5*yaw_PID ; // front right
-    m2_command_scaled = thro_des - 0.5*yaw_PID ; // front left
-    m3_command_scaled = -4* roll_PID + pitch_PID ; //rear right
-    m4_command_scaled = +4* roll_PID + pitch_PID; //rear left
+    m1_command_scaled = thro_des - 2*roll_PID + 1*yaw_PID ; // front right
+    m2_command_scaled = thro_des + 2*roll_PID - 1*yaw_PID ; // front left
+    m3_command_scaled = -3* roll_PID + 0.5* pitch_PID ; //rear right
+    m4_command_scaled = +3* roll_PID + 0.5* pitch_PID; //rear left
+
+    s1_command_scaled = 0.93 + 0.35*pitch_PID + 0.1*pitch_passthru; // Front tilt
+    */
     
-    s1_command_scaled = 0.93 + 0.6*pitch_PID + 0.6*pitch_passthru; // Front tilt
+    i_limit = 25.0;     //Integrator saturation level, mostly for safety (default 25.0)
+    maxRoll = 40.0;     //Max roll angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode 
+    maxPitch = 25.0;    //Max pitch angle in degrees for angle mode (maximum ~70 degrees), deg/sec for rate mode
+    maxYaw = 160.0;     //Max yaw rate in deg/sec
 
-
+    // QUAD mode 
+    controlANGLE(); //Stabilize on angle setpoint
+    m1_command_scaled = thro_des + 1*yaw_PID ; // front right
+    m2_command_scaled = thro_des - 1*yaw_PID ; // front left
+    m3_command_scaled = -2* roll_PID + 0.6* pitch_PID ; //rear right
+    m4_command_scaled = +2* roll_PID + 0.6* pitch_PID; //rear left
+    
+    s1_command_scaled = 0.80 + 1*pitch_PID + 0.2*pitch_passthru; // Front tilt
   }
 
 // LEFT OVER SIGNALS
